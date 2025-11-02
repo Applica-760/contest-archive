@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>漂着ごみモニタリングシステム開発</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <header class="hero">
+      <div class="hero-copy">
+        <h1>漂着ごみモニタリングシステム開発</h1>
+        <p class="lead">離島の漂着ごみ問題に挑む IoT モニタリング＆清掃支援システム。</p>
+        <div class="badges">
+          <span class="badge">IoT</span>
+          <span class="badge">LPWA / LoRa</span>
+          <span class="badge">画像処理AI（YOLOv5）</span>
+          <span class="badge">クラウド可視化</span>
+        </div>
+      </div>
+    </header>
+
+    <section id="overview" class="panel">
+      <h2>プロジェクト概要</h2>
+      <p>離島地域で深刻化する漂着ごみによる水産業・観光業への影響を、IoT と AI で可視化・効率化するプロジェクトに着手しました。従来の人力モニタリングに伴う高コスト、調査点・回数の不足、目視計測のバラつきといった課題に対し、センサーと通信、機械学習、Web によるソリューションを開発しました。</p>
+    </section>
+
+    <section>
+      <h2>解決する課題</h2>
+      <ul>
+        <li>モニタリング作業の人件費・移動費負担が大きい</li>
+        <li>調査地点・回数が十分でなくデータが偏る</li>
+        <li>目視計測による主観差やバラつき</li>
+        <li>清掃活動計画が担当者の経験に依存</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>アプローチ</h2>
+      <ol>
+        <li><strong>モニタリングの自動化・低コスト化</strong>：海岸に設置したカメラで撮影し、エッジ側で AI が漂着物を検出。結果のみを LPWA（Private LoRa）で送信して通信量を削減。</li>
+        <li><strong>清掃活動の最適化支援</strong>：クラウドでデータを蓄積・可視化。推定された量に基づき、清掃場所・必要人数・ゴミ袋枚数などを Web から提案。</li>
+        <li><strong>将来の漂着予測と事業化</strong>：気象データと実測データを組み合わせ、漂着量の予測モデルを構築。自治体コスト削減とスケール展開を目指す。</li>
+      </ol>
+    </section>
+
+    <section class="panel">
+      <h2>設計背景と技術選定</h2>
+      <h3>通信環境の制約</h3>
+      <ul>
+        <li>クライアント（海岸側設置機器）は LTE 圏外の地点が多く、常時インターネット接続が困難。</li>
+        <li>省電力で長距離通信でき、現地で独自網を敷ける手段が必要 → LPWA（Private LoRa）を採用。</li>
+      </ul>
+      <h3>データ量の制約と対策</h3>
+      <ul>
+        <li>LoRa は低スループット・小ペイロードのため、画像データをそのまま送信するのは非現実的。</li>
+        <li>エッジ側で物体検出（YOLOv5）を行い、送信するのは検出結果のメタデータ（クラス、座標、信頼度、個数など）のみ。</li>
+        <li>この設計により、MB 級の画像を数百バイト規模のテキスト情報に置き換えて送信し、通信量と電力を大幅に削減。</li>
+      </ul>
+      <h3>全体フロー</h3>
+      <ol>
+        <li>海岸クライアント（Raspberry Pi + カメラ）が定期撮影・推論を実行。</li>
+        <li>検出結果のみを Private LoRa でゲートウェイへ送信。</li>
+        <li>ゲートウェイがクラウドへ中継し、可視化 Web に反映（ダッシュボード）。</li>
+      </ol>
+    </section>
+
+    <section class="panel">
+      <h2>実施内容</h2>
+      <h3>体制と連携</h3>
+      <p>通信・画像・筐体・Web の 4 チームで開発。行政や地域団体と連携し、現地対談・共同清掃・オンライン会議を通じて要件を確認しました。</p>
+
+      <h3>画像処理 AI</h3>
+      <p>YOLOv5 を採用。592 枚の実地画像をアノテーションし、特に危険物を含む可能性のある「青いポリタンク」を重点クラスとして学習。2.01 MB の画像を検出結果のテキスト（488 B）に圧縮して送信できることを確認しました。</p>
+
+      <h3>ハードウェア・通信</h3>
+      <p>海岸側クライアントで撮影・推論を実行し、ゲートウェイで受信・クラウド転送する二層構成。Private LoRa を用い、太陽光発電・耐風設計・テトラポット固定等の屋外要件に対応する筐体設計と風荷重計算も検討しました。</p>
+
+    </section>
+
+    <section class="panel">
+      <h2>担当領域（個人の役割）</h2>
+      <ul>
+        <li>物体検出モデルの構築（YOLOv5 の学習・評価・推論パイプライン整備）</li>
+        <li>クラウド基盤の設計・構築（データ収集・蓄積・API・可視化基盤の連携）</li>
+        <li>最終可視化の Web ページ実装（ダッシュボード／閲覧用 UI）</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>獲得したスキル・技術スタック</h2>
+      <ul>
+        <li>Raspberry Pi を用いた組込み／マイコンプログラミング</li>
+        <li>エッジ AI 推論（モデル最適化、リソース制約下での実装）</li>
+        <li>実践的なクラウド構築（データパイプライン、可観測性、セキュリティの設計）</li>
+        <li>通信技術（LPWA/LoRa、ゲートウェイ設計・運用）への理解</li>
+      </ul>
+    </section>
+
+    <section class="panel">
+      <h2>🏆受賞・採択・助成</h2>
+      <ul class="awards">
+        <li>令和3年度 自治体フォーラム ／ 技術賞受賞</li>
+        <li>令和3年度 自治体研究奨励補助金 採択（研究補助金交付額：<strong>約360,000円</strong>）</li>
+        <li>令和5年度 自治体研究奨励補助金 採択（研究補助金交付額：<strong>約190,000円</strong>）</li>
+        <li>令和4年度 学生コンテスト 予算採択（獲得研究費：<strong>約1,600,000円</strong>）</li>
+        <li>令和5年度 学生コンテスト 予算採択（獲得研究費：<strong>約1,500,000円</strong>）</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>システム構成イメージ</h2>
+      <div class="illustration">
+        <figure>
+          <img src="images/system.png" alt="システム構成図（PNG）" />
+          <figcaption>構成図</figcaption>
+        </figure>
+        
+      </div>
+    </section>
+
+  </div>
+</body>
+</html>
